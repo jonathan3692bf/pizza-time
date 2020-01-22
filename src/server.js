@@ -29,33 +29,27 @@ app.get('/orders', (req, res) => {
     })
 })
 app.post('/orders', (req, res) => {
-
+    const orderValues = { status: "new" }
     const errors = []
-    const { firstName, lastName, streetName, streetNumber, postalCode, city, phone, items } = req.body
 
     ORDER_TABLE_FIELD_NAMES.forEach(field => {
         if ((field === 'items' && req.body.items && req.body.items.length === 0) || (!req.body[field])) {
-            errors.push({
-                field,
-                description: 'Required field'
-            });
+            errors.push({ field, description: 'Required field' });
         }
     })
     if (errors.length) {
         return res.json({ status: 'failure', errors })
     }
 
-    pg('orders').insert({
-        status: "new",
-        firstName,
-        lastName,
-        streetName,
-        streetNumber,
-        postalCode,
-        city,
-        phone,
-        items: JSON.stringify(items)
-    }, ['id']).then(row => {
+    ORDER_TABLE_FIELD_NAMES.forEach(field => {
+        if (field === 'items') {
+            orderValues[field] = JSON.stringify(req.body[field])
+        } else {
+            orderValues[field] = req.body[field]
+        }
+    })
+
+    pg('orders').insert(orderValues, ['id']).then(row => {
         res.json({ status: 'success', response: row })
     }).catch(error => {
         res.json({ status: 'failure', errors: [error] })
@@ -63,28 +57,36 @@ app.post('/orders', (req, res) => {
 
 })
 app.get('/orders/:orderId', (req, res) => {
-    const dbResponse = pg('orders').where({ 'id': req.params.orderId}).select();
-    dbResponse.then(row => {
+    const query = pg('orders').where({ 'id': req.params.orderId}).select();
+    query.then(row => {
         res.json({ status: 'success', response: row })
     }).catch(error => {
         res.json({ status: 'failure', errors: [error] })
     })
 })
 app.put('/orders/:orderId', (req, res) => {
-    const { status, firstName, lastName, streetName, streetNumber, postalCode, city, phone, items } = req.body
-    const dbResponse = pg('orders').where({ 'id': req.params.orderId }).update({
-        status, firstName, lastName, streetName, streetNumber, postalCode, city, phone, items: JSON.stringify(items)
-    }, ['id', 'status'].concat(ORDER_TABLE_FIELD_NAMES));
+    const updatedOrderValues = {}
+    const query = pg('orders').where({ 'id': req.params.orderId })
+    const returnedColumns = ['id', 'status'].concat(ORDER_TABLE_FIELD_NAMES)
 
-    dbResponse.then(row => {
+    returnedColumns.slice(1).forEach(field => {
+        if (field === 'items' && req.body[field]) {
+            updatedOrderValues[field] = JSON.stringify(req.body[field])
+        } else if (req.body[field]) {
+            updatedOrderValues[field] = req.body[field]
+        }
+    })
+
+    query.update(updatedOrderValues, returnedColumns).then(row => {
         res.json({ status: 'success', response: row })
     }).catch(error => {
         res.json({ status: 'failure', errors: [error] })
     })
 })
 app.delete('/orders/:orderId', (req, res) => {
-    const dbResponse = pg('orders').where({ 'id': req.params.orderId }).del();
-    dbResponse.then((rowsDeleted) => {
+    const query = pg('orders').where({ 'id': req.params.orderId }).del();
+
+    query.then((rowsDeleted) => {
         res.json({ status: 'success' })//, rowsDeleted })
     }).catch(error => {
         res.json({ status: 'failure', errors: [error] })
