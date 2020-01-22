@@ -13,7 +13,9 @@ app.get('/orders', (req, res) => {
     const dbResponse = pg('orders').select();
 
     dbResponse.then(rows => {
-        res.json({ method: 'GET', query: req.query, rows })
+        res.json({ status: 'success', response: rows })
+    }).catch(error => {
+        res.json({ status: 'failure', errors: [error] })
     })
 })
 app.post('/orders', (req, res) => {
@@ -30,7 +32,7 @@ app.post('/orders', (req, res) => {
         }
     })
     if (errors.length) {
-        return res.json({ errors })
+        return res.json({ status: 'failure', errors })
     }
 
     pg('orders').insert({
@@ -46,15 +48,17 @@ app.post('/orders', (req, res) => {
     }, ['id']).then(row => {
         res.json({ status: 'success', response: row })
     }).catch(error => {
-        res.json({ status: 'failure', error })
+        res.json({ status: 'failure', errors: [error] })
     })
 
 })
 app.get('/orders/:orderId', (req, res) => {
     const dbResponse = pg('orders').where({ 'id': req.params.orderId}).select();
     dbResponse.then(row => {
-        res.json({ method: 'GET', params: req.params, row })
-    });
+        res.json({ status: 'success', response: row })
+    }).catch(error => {
+        res.json({ status: 'failure', errors: [error] })
+    })
 })
 app.put('/orders/:orderId', (req, res) => {
     const { status, firstName, lastName, streetName, streetNumber, postalCode, city, phone, items } = req.body
@@ -65,15 +69,15 @@ app.put('/orders/:orderId', (req, res) => {
     dbResponse.then(row => {
         res.json({ status: 'success', response: row })
     }).catch(error => {
-        res.json({ status: 'failure', error, body: req.body})
+        res.json({ status: 'failure', errors: [error] })
     })
 })
 app.delete('/orders/:orderId', (req, res) => {
     const dbResponse = pg('orders').where({ 'id': req.params.orderId }).del();
     dbResponse.then((rowsDeleted) => {
-        res.json({ status: 'success', orderId: req.params.orderId})//, rowsDeleted })
+        res.json({ status: 'success' })//, rowsDeleted })
     }).catch(error => {
-        res.json({ status: 'failure', error, orderId: req.params.orderId})
+        res.json({ status: 'failure', errors: [error] })
     })
 
 })
