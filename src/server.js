@@ -10,9 +10,19 @@ app.use(express.urlencoded({ extended: true })) // for parsing application/x-www
 
 
 app.get('/orders', (req, res) => {
-    const dbResponse = pg('orders').select();
+    const { filterStatus: status, filterCustomer: customer } = req.query
+    const customerFilterString = `LOWER("firstName" || ' ' || "lastName") LIKE '%${customer.toLowerCase()}%'`
+    let query = pg('orders').select()
 
-    dbResponse.then(rows => {
+    if (status && customer) {
+        query = query.where({ status }).andWhereRaw(customerFilterString)
+    } else if (status) {
+        query = query.where({ status })
+    } else if (customer) {
+        query = query.whereRaw(customerFilterString)
+    }
+
+    query.then(rows => {
         res.json({ status: 'success', response: rows })
     }).catch(error => {
         res.json({ status: 'failure', errors: [error] })
