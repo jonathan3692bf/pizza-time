@@ -1,7 +1,7 @@
 const express = require('express')
 const pg = require('./db/')
 const app = express()
-const port = 3000
+const port = 8000
 
 const ORDER_TABLE_FIELD_NAMES = ['firstName', 'lastName', 'streetName', 'streetNumber', 'postalCode', 'city', 'phone', 'items'];
 
