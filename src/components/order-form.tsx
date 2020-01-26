@@ -18,9 +18,40 @@ const steps = [
     },
 ];
 
+type PizzaForm = {
+    keys: number[],
+    pizzas: [string, string, number]
+}
+
+
 const OrderForm = (props: any) => {
     const [currentStep, setCurrentStep] = useState(0);
-
+    const [pizzaForm, setPizzaForm] = useState({
+        "keys": [0, 1, 2],
+        "pizzas": [["Margarita", "Small", 1], ["Margarita", "Medium", 1], ["Margarita", "Large", 1]]
+    })
+    const submitPizzaSelection = (err: object, values: any) => {
+        if (!err) {
+            const { keys, pizzas } = values;
+            setPizzaForm({ keys, pizzas })
+            console.log('Received values of form: ', values);
+            setCurrentStep(currentStep + 1)
+            // console.log('Merged values:', keys.map((key: number) => pizzas[key]));
+        }
+    }
+    const NextButton = () => (
+        <Button type="primary" onClick={() => { /*this.props.form.validateFields(this.props.onSubmit)*/ }}>
+            Next
+        </Button>)
+    const PreviousButton = () => (
+        <Button style={{ marginLeft: 8 }} onClick={() => setCurrentStep(currentStep - 1)}>
+            Previous
+        </Button>)
+    const DoneButton = () => (
+        <Button type="primary" onClick={() => message.success('Processing complete!')}>
+            Done
+        </Button>
+    )
     return (
         <div>
             <Steps current={currentStep}>
@@ -29,24 +60,15 @@ const OrderForm = (props: any) => {
                 ))}
             </Steps>
             <div className="steps-content">
-                {currentStep === 0 && <PizzaSelector />}
-            </div>
-            <div className="steps-action">
-                {currentStep < steps.length - 1 && (
-                    <Button type="primary" onClick={() => setCurrentStep(currentStep + 1)}>
-                        Next
-                    </Button>
-                )}
-                {currentStep === steps.length - 1 && (
-                    <Button type="primary" onClick={() => message.success('Processing complete!')}>
-                        Done
-                    </Button>
-                )}
-                {currentStep > 0 && (
-                    <Button style={{ marginLeft: 8 }} onClick={() => setCurrentStep(currentStep - 1)}>
-                        Previous
-                    </Button>
-                )}
+                {currentStep === 0 && <PizzaSelector keys={pizzaForm.keys} pizzas={pizzaForm.pizzas} onSubmit={submitPizzaSelection} />}
+                {currentStep === 1 && <PizzaSelector keys={pizzaForm.keys} pizzas={pizzaForm.pizzas} onSubmit={submitPizzaSelection}>
+                    <NextButton />
+                    <PreviousButton />
+                </PizzaSelector>}
+                {currentStep === 2 && <PizzaSelector keys={pizzaForm.keys} pizzas={pizzaForm.pizzas} onSubmit={submitPizzaSelection}>
+                    <DoneButton />
+                    <PreviousButton />
+                </PizzaSelector>}
             </div>
         </div>
     )
