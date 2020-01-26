@@ -18,12 +18,12 @@ function onChange(cascadeValues) {
         return value === cascadeValues[1]
     })
 
-    delete flavors[row].children[column]
-    if (flavors[row].children.length === 0) {
-        delete flavors[row]
-    }
+    // delete flavors[row].children[column]
+    // if (flavors[row].children.length === 0) {
+    //     delete flavors[row]
+    // }
 
-    console.log(cascadeValues, flavors);
+    console.log(cascadeValues, flavors, '2');
 }
 
 
