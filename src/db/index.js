@@ -20,7 +20,12 @@ pg.schema.hasTable('orders').then(function (exists) {
             t.string('postalCode');
             t.string('city');
             t.string('phone');
+            t.string('cardNumber');
+            t.string('expirationMonth');
+            t.string('expirationYear');
+            t.string('securityCode');
             t.json('items');
+            t.integer('total');
             t.enu('status', ['new', 'preparing', 'delivering', 'delivered']).defaultTo('new');
         });
     }
