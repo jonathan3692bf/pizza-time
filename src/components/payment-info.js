@@ -14,9 +14,9 @@ class PaymentInfo extends React.Component {
         return (
             <Fragment>
                 <Form.Item {...formItemLayout} label="Credit card number" style={{width: '100%'}}>
-                    {getFieldDecorator('number', {
+                    {getFieldDecorator('cardNumber', {
                         rules: cardRules.concat({ pattern:/^[0-9]{16}$/ }),
-                        initialValue: this.props.number
+                        initialValue: this.props.cardNumber
                     })(<Input type="tel" placeholder="Please input your card number" />)}
                 </Form.Item>
                 <Form.Item {...formItemLayout} style={{ marginBottom: 0 }} label="Expiration (MM/YY)" required={true}>
@@ -53,7 +53,7 @@ class PaymentInfo extends React.Component {
 
 
 PaymentInfo.propTypes = {
-    number: PropTypes.string,
+    cardNumber: PropTypes.string,
     expirationMonth: PropTypes.string,
     expirationYear: PropTypes.string,
     securityCode: PropTypes.string,

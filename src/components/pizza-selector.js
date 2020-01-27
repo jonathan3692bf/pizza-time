@@ -2,9 +2,13 @@ import React from "react";
 import PropTypes from 'prop-types';
 import { Form, Cascader, Icon, Button } from 'antd';
 
-const QUANTITY = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-const SIZE = ['Small', 'Medium', 'Large']
-const FLAVORS = ['Margarita', 'Marinara', 'Salami']
+export const QUANTITY = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+export const SIZE = ['Small', 'Medium', 'Large']
+export const PRICE_MAP = [300, 500, 800].reduce((prev, curr, index) => {
+    prev[SIZE[index]] = curr
+    return prev;
+}, {})
+export const FLAVORS = ['Margarita', 'Marinara', 'Salami']
 
 let id = 0;
 

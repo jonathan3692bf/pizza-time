@@ -26,7 +26,7 @@ type DeliveryAddressForm = {
     phone: string
 }
 type PaymentInfoForm = {
-    number: string,
+    cardNumber: string,
     expirationMonth: string,
     expirationYear: string,
     securityCode: string
@@ -51,7 +51,7 @@ const OrderForm = () => {
         phone: '1234'
     });
     const [paymentInfoForm, setPaymentInfoForm] = useState({
-        number: '1234123412341234',
+        cardNumber: '1234123412341234',
         expirationMonth: '09',
         expirationYear: '20',
         securityCode: '023'
