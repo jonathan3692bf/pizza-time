@@ -1,20 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import PropTypes from 'prop-types';
-import { Form, Input, Icon, Button } from 'antd';
-import { Cascader } from 'antd';
-
-let id = 0;
+import { Form, Cascader, Icon, Button } from 'antd';
 
 const QUANTITY = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 const SIZE = ['Small', 'Medium', 'Large']
 const FLAVORS = ['Margarita', 'Marinara', 'Salami']
 
-function onChange(cascadeValues) {
-    console.log(cascadeValues);
-}
+let id = 0;
 
-
-class DynamicFieldSet extends React.Component {
+class PizzaSelector extends React.Component {
     calcRemainingPizzaCombos = (currentPizza) => {
         const { form } = this.props;
         const keys = form.getFieldValue('keys');
@@ -30,7 +24,7 @@ class DynamicFieldSet extends React.Component {
                 }))
             }))
         }))
-        console.log(keys)
+
         keys.forEach(key => {
             const pizza = form.getFieldValue(`pizzas[${key}]`)
             if (Number(key) !== currentPizza && pizza) {
@@ -46,12 +40,11 @@ class DynamicFieldSet extends React.Component {
                         }
                     }
                 }
-
             }
         })
 
         return remainingFlavors;
-    }
+    };
     remove = k => {
         const { form } = this.props;
         // can use data-binding to get
@@ -66,7 +59,6 @@ class DynamicFieldSet extends React.Component {
             keys: keys.filter(key => key !== k),
         });
     };
-
     add = () => {
         const { form } = this.props;
         // can use data-binding to get
@@ -79,28 +71,11 @@ class DynamicFieldSet extends React.Component {
         });
     };
 
-    // handleSubmit = e => {
-    //     e.preventDefault();
-    //     this.props.form.validateFields((err, values) => {
-    //         if (!err) {
-    //             const { keys, pizza } = values;
-    //             console.log('Received values of form: ', values);
-    //             console.log('Merged values:', keys.map(key => pizzas[key]));
-    //         }
-    //     });
-    // };
-
     render() {
         const { getFieldDecorator, getFieldValue } = this.props.form;
         const formItemLayout = {
-            labelCol: {
-                xs: { span: 24 },
-                sm: { span: 4 },
-            },
-            wrapperCol: {
-                xs: { span: 24 },
-                sm: { span: 20 },
-            },
+            labelCol: { span: 4, offset: 6 },
+            wrapperCol: { span: 12 },
         };
         getFieldDecorator('keys', { initialValue: this.props.keys || [] });
         if (id === 0 && this.props.keys && this.props.keys.length) {
@@ -113,46 +88,40 @@ class DynamicFieldSet extends React.Component {
             <Form.Item
                 {...formItemLayout}
                 label={'Pizza (type / size / quantity)'}
-                required={false}
+                required={true}
                 key={k}
             >
                 {getFieldDecorator(`pizzas[${k}]`, {
-                    // validateTrigger: ['onBlur'],
                     rules: pizzaRules,
                     initialValue: this.props.pizzas && this.props.pizzas[k]
-                })(<Cascader options={this.calcRemainingPizzaCombos(k)} onChange={onChange} placeholder="Please select" style={{width: '40%', marginRight: '2em'}}/>)}
+                })(<Cascader options={this.calcRemainingPizzaCombos(k)} placeholder="Please select" style={{width: '40%', marginRight: '2em'}}/>)}
                 {keys.length > 1 ? (
-                    <Icon
-                        className="dynamic-delete-button"
-                        type="minus-circle-o"
-                        onClick={() => this.remove(k)}
-                    />
+                    <Icon className="dynamic-delete-button" type="minus-circle-o" onClick={() => this.remove(k)} />
                 ) : null}
             </Form.Item>
         ));
         return (
-            <Form onSubmit={this.handleSubmit}>
+            <Form>
                 {formItems}
-                {keys.length < 9 && <Form.Item {...formItemLayout}>
-                    <Button type="dashed" onClick={this.add} style={{ width: '60%' }}>
+                {keys.length < 9 && <Form.Item wrapperCol={{offset: 6, span: 10 }}>
+                    <Button type="dashed" onClick={this.add} style={{ width: '100%' }}>
                         <Icon type="plus" /> Add a pizza
                     </Button>
                 </Form.Item>}
-                <Form.Item>
-                    <Button type="primary" onClick={() => { this.props.form.validateFields(this.props.onSubmit) }}>
-                        Next
-                    </Button>
-                </Form.Item>
+                <Button type="primary" onClick={() => { this.props.form.validateFields(this.props.onSubmit) }}>
+                    Next
+                </Button>
             </Form>
         );
     }
 }
 
-DynamicFieldSet.propTypes = {
+PizzaSelector.propTypes = {
     keys: PropTypes.array,
     pizzas: PropTypes.array,
     onSubmit: PropTypes.func
 };
-const WrappedDynamicFieldSet = Form.create({ name: 'dynamic_form_item' })(DynamicFieldSet);
 
-export default WrappedDynamicFieldSet;
+const WrappedPizzaSelector = Form.create()(PizzaSelector);
+
+export default WrappedPizzaSelector;
