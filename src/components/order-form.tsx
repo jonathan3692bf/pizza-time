@@ -3,6 +3,7 @@ import { Steps, message } from 'antd';
 import PizzaSelector from './pizza-selector'
 import DeliveryAddress from './delivery-address'
 import PaymentInfo from './payment-info'
+import ConfirmationDialog from './confirmation-dialog'
 
 const { Step } = Steps;
 const steps = [
@@ -31,12 +32,9 @@ type PaymentInfoForm = {
     expirationYear: string,
     securityCode: string
 }
-type ConsentForm = {
-    tosConsent: boolean
-}
 
 const OrderForm = () => {
-    const [currentStep, setCurrentStep] = useState(2);
+    const [currentStep, setCurrentStep] = useState(3);
     const [pizzaForm, setPizzaForm] = useState({
         "keys": [0, 1, 2],
         "pizzas": [["Margarita", "Small", 1], ["Margarita", "Medium", 1], ["Margarita", "Large", 1]]
@@ -56,9 +54,8 @@ const OrderForm = () => {
         expirationYear: '20',
         securityCode: '023'
     });
-    const [consentForm, setConsentForm] = useState({
-        tosConsent: false
-    });
+    const [termsAgreed, setTermsAgreed] = useState(false);
+
     const submitPizzaSelection = (err: object, values: PizzaForm) => {
         if (!err) {
             const { keys, pizzas } = values;
@@ -91,17 +88,19 @@ const OrderForm = () => {
         console.log('(cancelled) Received values of payment info form: ', values);
         setCurrentStep(currentStep - 1)
     }
-    const submitOrder = (err: object, values: ConsentForm) => {
-        if (!err) {
-            setConsentForm(values)
-            console.log('Received values of consent form: ', values);
-            // setCurrentStep(currentStep + 1)
+    const submitOrder = (checked: boolean) => {
+        setTermsAgreed(checked)
+        if (!checked) {
+            message.error('Missing field!')
+        } else {
             message.success('Processing complete!')
         }
+
     }
-    const cancelOrder = (err: object, values: ConsentForm) => {
-        setConsentForm(values)
-        console.log('(cancelled) Received values of consent form: ', values);
+
+    const cancelOrder = (checked: boolean) => {
+        setTermsAgreed(checked)
+        console.log('(cancelled) Received values of consent form: ', checked);
         setCurrentStep(currentStep - 1)
     }
 
@@ -116,7 +115,7 @@ const OrderForm = () => {
                 {currentStep === 0 && <PizzaSelector {...pizzaForm} onSubmit={submitPizzaSelection} />}
                 {currentStep === 1 && <DeliveryAddress {...deliveryForm} onSubmit={submitDeliveryAddress} onCancel={cancelDeliveryAddress}/>}
                 {currentStep === 2 && <PaymentInfo {...paymentInfoForm} onSubmit={submitPaymentInfo} onCancel={cancelPaymentInfo} />}
-                {/* {currentStep === 3 && <ConfirmationDialog {...pizzaForm} {...deliveryForm} {...paymentInfoForm} {...consentForm} onSubmit={submitOrder} onCancel={cancelOrder} /> */}
+                {currentStep === 3 && <ConfirmationDialog {...pizzaForm} {...deliveryForm} {...paymentInfoForm} checked={termsAgreed} onSubmit={submitOrder} onCancel={cancelOrder} />}
             </div>
         </div>
     )
