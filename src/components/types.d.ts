@@ -1,4 +1,4 @@
-type Pizza = [string, string, number, number][]
+type Pizza = ReactText[][]//[string, string, number, number][]
 type PizzaForm = {
     keys: number[],
     pizzas: Pizza,
@@ -18,4 +18,9 @@ type PaymentInfoForm = {
     expirationMonth: string,
     expirationYear: string,
     securityCode: string
+}
+interface ConfirmationDialogProps extends PizzaForm, DeliveryAddressForm, PaymentInfoForm {
+    checked: boolean,
+    onSubmit: Function,
+    onCancel: Function
 }

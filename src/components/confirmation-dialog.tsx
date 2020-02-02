@@ -1,13 +1,11 @@
 import React, { Fragment, useState } from 'react';
-import PropTypes from 'prop-types';
 import { Typography, Checkbox, Button, List } from 'antd';
 const { Title, Text } = Typography;
 
-
-const ConfirmationDialog = (props) => {
+const ConfirmationDialog = (props: ConfirmationDialogProps) => {
     const [ checked, setChecked ] = useState(props.checked)
     const [error, setError] = useState('');
-    const handleChange = (e) => {
+    const handleChange = (e: any) => {
         if (e.target.checked) {
             setChecked(true)
             setError('')
@@ -74,26 +72,6 @@ const ConfirmationDialog = (props) => {
 
         </Fragment>
     )
-}
-
-ConfirmationDialog.propTypes = {
-    keys: PropTypes.array,
-    pizzas: PropTypes.array,
-    total: PropTypes.number,
-    firstName: PropTypes.string,
-    lastName: PropTypes.string,
-    streetName: PropTypes.string,
-    streetNumber: PropTypes.string,
-    postalCode: PropTypes.string,
-    city: PropTypes.string,
-    phone: PropTypes.string,
-    cardNumber: PropTypes.string,
-    expirationMonth: PropTypes.string,
-    expirationYear: PropTypes.string,
-    securityCode: PropTypes.string,
-    checked: PropTypes.bool,
-    onSubmit: PropTypes.func,
-    onCancel: PropTypes.func
 }
 
 export default ConfirmationDialog
