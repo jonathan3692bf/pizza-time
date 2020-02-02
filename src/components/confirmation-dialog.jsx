@@ -1,7 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Typography, Checkbox, Button } from 'antd';
-import { PRICE_MAP } from './pizza-selector'
+import { Typography, Checkbox, Button, List } from 'antd';
 const { Title, Text } = Typography;
 
 
@@ -26,10 +25,20 @@ const ConfirmationDialog = (props) => {
             setError('Please confirm that you agree to the terms of service!')
         }
     }
+
     return (
         <Fragment>
             <Title level={4}>Selected Items</Title>
-                {JSON.stringify(props.pizzas)}
+                <List
+                    bordered
+                    dataSource={props.pizzas}
+                    footer={<Text strong>total: ${props.total}</Text>}
+                    renderItem={([style, size, quantity, cost]) => {
+                        return <List.Item>
+                            {quantity}x {size} {style}: ${cost}
+                        </List.Item>
+                    }}
+                />
             <Title level={4}>Delivery Address</Title>
             <Text>
                 {`${props.firstName} ${props.lastName}`}
@@ -68,7 +77,9 @@ const ConfirmationDialog = (props) => {
 }
 
 ConfirmationDialog.propTypes = {
+    keys: PropTypes.array,
     pizzas: PropTypes.array,
+    total: PropTypes.number,
     firstName: PropTypes.string,
     lastName: PropTypes.string,
     streetName: PropTypes.string,

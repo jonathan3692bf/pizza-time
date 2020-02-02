@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import { Steps, message } from 'antd';
-import PizzaSelector from './pizza-selector'
+import PizzaSelector, { SIZE } from './pizza-selector'
 import DeliveryAddress from './delivery-address'
 import PaymentInfo from './payment-info'
 import ConfirmationDialog from './confirmation-dialog'
+
+const PRICE_MAP: any = [3, 5, 8].reduce((prev: any, curr:any, index: number) => {
+    prev[SIZE[index]] = curr
+    return prev;
+}, {})
 
 const { Step } = Steps;
 const steps = [
@@ -13,31 +18,12 @@ const steps = [
     { title: 'Confirm Order' }
 ];
 
-type PizzaForm = {
-    keys: number[],
-    pizzas: [string, string, number][]
-}
-type DeliveryAddressForm = {
-    firstName: string,
-    lastName: string,
-    streetName: string,
-    streetNumber: string,
-    postalCode: string,
-    city: string,
-    phone: string
-}
-type PaymentInfoForm = {
-    cardNumber: string,
-    expirationMonth: string,
-    expirationYear: string,
-    securityCode: string
-}
-
 const OrderForm = () => {
     const [currentStep, setCurrentStep] = useState(3);
     const [pizzaForm, setPizzaForm] = useState({
         "keys": [0, 1, 2],
-        "pizzas": [["Margarita", "Small", 1], ["Margarita", "Medium", 1], ["Margarita", "Large", 1]]
+        "pizzas": [["Margarita", "Small", 1, 3], ["Margarita", "Medium", 1, 5], ["Margarita", "Large", 1, 8]],
+        "total": 16
     });
     const [deliveryForm, setDeliveryForm] = useState({
         firstName: 'Jonathan',
@@ -58,9 +44,16 @@ const OrderForm = () => {
 
     const submitPizzaSelection = (err: object, values: PizzaForm) => {
         if (!err) {
-            const { keys, pizzas } = values;
-            setPizzaForm({ keys, pizzas })
-            console.log('Received values of pizza form: ', values);
+            let { keys, pizzas } = values;
+            pizzas = pizzas.map(([style, size, quantity]) => {
+                return [style, size, quantity, PRICE_MAP[size] * quantity]
+            })
+            const total = pizzas.map(([style, size, quantity, price]) => price)
+            .reduce((prev, curr) => {
+                return prev + curr
+            }, 0)
+            setPizzaForm({ keys, pizzas, total })
+            console.log('Received values of pizza form: ', { keys, pizzas, total });
             setCurrentStep(currentStep + 1)
         }
     }
