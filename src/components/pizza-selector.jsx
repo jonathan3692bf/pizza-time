@@ -1,7 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Form, Cascader, Icon, Button } from 'antd';
-// import { FormComponentProps } from 'antd/es/form';
 
 export const QUANTITY = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 export const SIZE = ['Small', 'Medium', 'Large']
@@ -9,16 +8,9 @@ export const FLAVORS = ['Margarita', 'Marinara', 'Salami']
 
 let id = 0;
 
-// interface PizzaSelectorProps extends FormComponentProps {
-//     keys: number[],
-//     pizzas: Pizza,
-//     total: number,
-//     onSubmit: Function
-// }
-
-class PizzaSelector extends React.Component {
-    calcRemainingPizzaCombos = (currentPizza) => {
-        const { form } = this.props;
+const PizzaSelector = (props) => {
+    const calcRemainingPizzaCombos = (currentPizza) => {
+        const { form } = props;
         const keys = form.getFieldValue('keys');
         let remainingFlavors = FLAVORS.map(flavor => ({
             value: flavor,
@@ -53,8 +45,8 @@ class PizzaSelector extends React.Component {
 
         return remainingFlavors;
     };
-    remove = (k) => {
-        const { form } = this.props;
+    const remove = (k) => {
+        const { form } = props;
         // can use data-binding to get
         const keys = form.getFieldValue('keys');
         // We need at least one passenger
@@ -67,8 +59,8 @@ class PizzaSelector extends React.Component {
             keys: keys.filter((key) => key !== k),
         });
     };
-    add = () => {
-        const { form } = this.props;
+    const add = () => {
+        const { form } = props;
         // can use data-binding to get
         const keys = form.getFieldValue('keys');
         const nextKeys = keys.concat(id++);
@@ -79,51 +71,49 @@ class PizzaSelector extends React.Component {
         });
     };
 
-    render() {
-        const { form, onSubmit, pizzas } = this.props;
-        let keys = this.props.keys
-        const { getFieldDecorator, getFieldValue } = form;
-        const formItemLayout = {
-            labelCol: { span: 4, offset: 6 },
-            wrapperCol: { span: 12 },
-        };
-        getFieldDecorator('keys', { initialValue: keys || [] });
-        if (id === 0 && keys && keys.length) {
-            id = keys[keys.length - 1] + 1
-        }
-        const pizzaRules = [{ required: true, message: "Please specify pizza or delete this field." }]
-        keys = getFieldValue('keys');
-
-        const formItems = keys.map((k) => (
-            <Form.Item
-                {...formItemLayout}
-                label={'Pizza (type / size / quantity)'}
-                required={true}
-                key={k}
-            >
-                {getFieldDecorator(`pizzas[${k}]`, {
-                    rules: pizzaRules,
-                    initialValue: pizzas && pizzas[k]
-                })(<Cascader options={this.calcRemainingPizzaCombos(k)} placeholder="Please select" style={{width: '40%', marginRight: '2em'}}/>)}
-                {keys.length > 1 ? (
-                    <Icon className="dynamic-delete-button" type="minus-circle-o" onClick={() => this.remove(k)} />
-                ) : null}
-            </Form.Item>
-        ));
-        return (
-            <Form>
-                {formItems}
-                {keys.length < 9 && <Form.Item wrapperCol={{offset: 6, span: 10 }}>
-                    <Button type="dashed" onClick={this.add} style={{ width: '100%' }}>
-                        <Icon type="plus" /> Add a pizza
-                    </Button>
-                </Form.Item>}
-                <Button type="primary" onClick={() => { form.validateFields(onSubmit) }}>
-                    Next
-                </Button>
-            </Form>
-        );
+    const { form, onSubmit, pizzas } = props;
+    let keys = props.keys
+    const { getFieldDecorator, getFieldValue } = form;
+    const formItemLayout = {
+        labelCol: { span: 4, offset: 6 },
+        wrapperCol: { span: 12 },
+    };
+    getFieldDecorator('keys', { initialValue: keys || [] });
+    if (id === 0 && keys && keys.length) {
+        id = keys[keys.length - 1] + 1
     }
+    const pizzaRules = [{ required: true, message: "Please specify pizza or delete this field." }]
+    keys = getFieldValue('keys');
+
+    const formItems = keys.map((k) => (
+        <Form.Item
+            {...formItemLayout}
+            label={'Pizza (type / size / quantity)'}
+            required={true}
+            key={k}
+        >
+            {getFieldDecorator(`pizzas[${k}]`, {
+                rules: pizzaRules,
+                initialValue: pizzas && pizzas[k]
+            })(<Cascader options={calcRemainingPizzaCombos(k)} placeholder="Please select" style={{width: '40%', marginRight: '2em'}}/>)}
+            {keys.length > 1 ? (
+                <Icon className="dynamic-delete-button" type="minus-circle-o" onClick={() => remove(k)} />
+            ) : null}
+        </Form.Item>
+    ));
+    return (
+        <Form>
+            {formItems}
+            {keys.length < 9 && <Form.Item wrapperCol={{offset: 6, span: 10 }}>
+                <Button type="dashed" onClick={add} style={{ width: '100%' }}>
+                    <Icon type="plus" /> Add a pizza
+                </Button>
+            </Form.Item>}
+            <Button type="primary" onClick={() => { form.validateFields(onSubmit) }}>
+                Next
+            </Button>
+        </Form>
+    );
 }
 
 PizzaSelector.propTypes = {
